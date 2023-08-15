@@ -2,11 +2,12 @@
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_news_app/helper/news.dart';
 import 'package:flutter_news_app/screens/article_screen.dart';
 import 'package:flutter_news_app/models/article_model.dart';
 import 'package:flutter_news_app/widgets/bottom_nav_bar.dart';
 import 'package:liquid_pull_to_refresh/liquid_pull_to_refresh.dart';
+
+import '../helper/news_catcher_api.dart';
 
 class DiscoverScreen extends StatefulWidget {
   const DiscoverScreen({Key? key}) : super(key: key);
