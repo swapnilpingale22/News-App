@@ -57,6 +57,14 @@ class _SplashScreenState extends State<SplashScreen> {
                 color: Colors.grey[700],
               ),
             ),
+            const SizedBox(height: 30),
+            Text(
+              'Powered by: NewsCatcherApi.com',
+              style: TextStyle(
+                fontSize: 15,
+                color: Colors.grey[700],
+              ),
+            ),
           ],
         ),
       ),

@@ -197,8 +197,14 @@ class _NewsBodyState extends State<_NewsBody> {
                       placeholder: (context, url) => Image.asset(
                         'assets/images/placeholder.png',
                       ),
-                      errorWidget: (context, url, error) =>
-                          const Icon(Icons.error_rounded),
+                      errorWidget: (context, url, error) {
+                        return const Column(
+                          children: [
+                            Icon(Icons.error_rounded),
+                            Text('No Media')
+                          ],
+                        );
+                      },
                     ),
                   ),
                 ),
