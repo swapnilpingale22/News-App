@@ -2,7 +2,8 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_news_app/screens/article_screen.dart';
-import 'package:flutter_news_app/models/article_model.dart';
+// import 'package:flutter_news_app/models/article_model.dart';
+import 'package:flutter_news_app/models/newscatcher_model.dart';
 import 'package:flutter_news_app/screens/discover_screen.dart';
 import 'package:flutter_news_app/widgets/custom_tag.dart';
 import '../helper/news_catcher_api.dart';
@@ -32,7 +33,7 @@ class _HomeScreenState extends State<HomeScreen> {
     await newsClass.getNews();
 
     setState(() {
-      articles = newsClass.news;
+      articles = newsClass.news.cast<Article>();
       isLoading = false;
     });
   }
@@ -81,8 +82,8 @@ class _HomeScreenState extends State<HomeScreen> {
             : ListView(
                 padding: EdgeInsets.zero,
                 children: [
-                  if (article != null) _NewsOfTheDay(article: article),
-                  _BreakingNews(articles: articles),
+                  if (article != null) _NewsOfTheDay(news: article),
+                  _BreakingNews(news: articles),
                 ],
               ),
       ),
@@ -92,10 +93,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
 class _BreakingNews extends StatelessWidget {
   const _BreakingNews({
-    required this.articles,
+    required this.news,
   });
 
-  final List<Article> articles;
+  final List<Article> news;
 
   @override
   Widget build(BuildContext context) {
@@ -131,7 +132,7 @@ class _BreakingNews extends StatelessWidget {
             height: 250,
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
-              itemCount: articles.length,
+              itemCount: news.length,
               itemBuilder: (context, index) {
                 return Container(
                   width: MediaQuery.of(context).size.width * 0.5,
@@ -141,7 +142,7 @@ class _BreakingNews extends StatelessWidget {
                       Navigator.pushNamed(
                         context,
                         ArticleScreen.routeName,
-                        arguments: articles[index],
+                        arguments: news[index],
                       );
                     },
                     child: Column(
@@ -160,8 +161,8 @@ class _BreakingNews extends StatelessWidget {
                             errorWidget: (context, url, error) {
                               return const Icon(Icons.error_rounded);
                             },
-                            cacheKey: articles[index].imageUrl,
-                            imageUrl: articles[index].imageUrl,
+                            cacheKey: news[index].media.toString(),
+                            imageUrl: news[index].media.toString(),
                             height: 120,
                             width: MediaQuery.of(context).size.width * 0.5,
                             fit: BoxFit.cover,
@@ -169,7 +170,7 @@ class _BreakingNews extends StatelessWidget {
                         ),
                         const SizedBox(height: 10),
                         Text(
-                          articles[index].title,
+                          news[index].title.toString(),
                           maxLines: 2,
                           style: Theme.of(context)
                               .textTheme
@@ -179,11 +180,11 @@ class _BreakingNews extends StatelessWidget {
                         ),
                         const SizedBox(height: 5),
                         Text(
-                          '${DateTime.now().difference(articles[index].createdAt).inHours} hours ago',
+                          '${DateTime.now().difference(news[index].publishedDate as DateTime).inHours} hours ago',
                           style: Theme.of(context).textTheme.bodySmall!,
                         ),
                         Text(
-                          'by ${articles[index].author}',
+                          'by ${news[index].author}',
                           style: Theme.of(context).textTheme.bodySmall!,
                         ),
                       ],
@@ -201,10 +202,10 @@ class _BreakingNews extends StatelessWidget {
 
 class _NewsOfTheDay extends StatelessWidget {
   const _NewsOfTheDay({
-    required this.article,
+    required this.news,
   });
 
-  final Article article;
+  final Article news;
 
   @override
   Widget build(BuildContext context) {
@@ -214,8 +215,8 @@ class _NewsOfTheDay extends StatelessWidget {
         image: DecorationImage(
           fit: BoxFit.cover,
           image: CachedNetworkImageProvider(
-            article.imageUrl,
-            cacheKey: article.imageUrl,
+            news.media.toString(),
+            cacheKey: news.media,
             errorListener: () {
               Image.asset('assets/images/placeholder.png');
             },
@@ -242,7 +243,7 @@ class _NewsOfTheDay extends StatelessWidget {
           ),
           const SizedBox(height: 10),
           Text(
-            article.title,
+            news.title.toString(),
             style: Theme.of(context).textTheme.headlineSmall!.copyWith(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
@@ -252,7 +253,7 @@ class _NewsOfTheDay extends StatelessWidget {
           TextButton(
             onPressed: () {
               Navigator.pushNamed(context, ArticleScreen.routeName,
-                  arguments: article);
+                  arguments: news);
             },
             style: TextButton.styleFrom(padding: EdgeInsets.zero),
             child: Row(

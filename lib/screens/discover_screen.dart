@@ -3,11 +3,11 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_news_app/screens/article_screen.dart';
-import 'package:flutter_news_app/models/article_model.dart';
 import 'package:flutter_news_app/widgets/bottom_nav_bar.dart';
 import 'package:liquid_pull_to_refresh/liquid_pull_to_refresh.dart';
 
 import '../helper/news_catcher_api.dart';
+import '../models/newscatcher_model.dart';
 
 class DiscoverScreen extends StatefulWidget {
   const DiscoverScreen({Key? key}) : super(key: key);
@@ -37,24 +37,12 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
     _fetchCategoryNews(tabs[0]);
   }
 
-  // Future<void> _fetchCategoryNews() async {
-  //   CategoryNews newsClass = CategoryNews();
-  //   await newsClass.getNews(tabs[0]);
-
-  //   setState(() {
-  //     articles = newsClass.news;
-  //     isLoading = false;
-  //   });
-  // }
-
   Future<void> _fetchCategoryNews(String category) async {
     CategoryNews newsClass = CategoryNews();
     await newsClass.getNews(category);
-    // print(
-    //     "Number of articles fetched for '$category': ${newsClass.news.length}");
 
     setState(() {
-      articles = newsClass.news;
+      articles = newsClass.news.cast<Article>();
       isLoading = false;
     });
   }
@@ -153,7 +141,7 @@ class _CategoryNewsState extends State<_CategoryNews> {
 
   void _groupArticlesByCategory() {
     for (var article in widget.articles) {
-      String category = _extractCategoryFromUrl(article.url);
+      String category = _extractCategoryFromUrl(article.link.toString());
       int categoryIndex = widget.tabs.indexOf(category);
       if (categoryIndex >= 0 && categoryIndex < widget.tabs.length) {
         articlesByCategory[categoryIndex].add(article);
@@ -219,8 +207,8 @@ class _CategoryNewsState extends State<_CategoryNews> {
                                   child: ClipRRect(
                                     borderRadius: BorderRadius.circular(5.0),
                                     child: CachedNetworkImage(
-                                      imageUrl: article.imageUrl,
-                                      cacheKey: article.imageUrl,
+                                      imageUrl: article.link.toString(),
+                                      cacheKey: article.link,
                                       height: 80,
                                       width: 80,
                                       fit: BoxFit.cover,
@@ -240,7 +228,7 @@ class _CategoryNewsState extends State<_CategoryNews> {
                                         CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        article.title,
+                                        article.title.toString(),
                                         maxLines: 2,
                                         overflow: TextOverflow.clip,
                                         style: Theme.of(context)
@@ -260,7 +248,7 @@ class _CategoryNewsState extends State<_CategoryNews> {
                                           ),
                                           const SizedBox(width: 5),
                                           Text(
-                                            '${DateTime.now().difference(article.createdAt).inHours} hours ago',
+                                            '${DateTime.now().difference(article.publishedDate as DateTime).inHours} hours ago',
                                             style: const TextStyle(
                                               fontSize: 12,
                                               color: Colors.black54,
@@ -286,108 +274,7 @@ class _CategoryNewsState extends State<_CategoryNews> {
                     ),
                   )
                   .toList(),
-            )
-
-            //  TabBarView(
-            //   children: tabs
-            //       .map(
-            //         (tab)
-            //          => Scrollbar(
-            //           radius: const Radius.circular(10),
-            //           child: ListView.builder(
-            //             shrinkWrap: true,
-            //             physics: const BouncingScrollPhysics(),
-            //             itemCount: articles.length,
-            //             itemBuilder: (context, index) {
-            //               return
-            //                InkWell(
-            //                 onTap: () {
-            //                   Navigator.pushNamed(
-            //                       context, ArticleScreen.routeName,
-            //                       arguments: articles[index]);
-            //                 },
-            //                 child: Row(
-            //                   children: [
-            //                     // ImageContainer(
-            //                     //   width: 80,
-            //                     //   height: 80,
-            //                     //   borderRadius: 5,
-            //                     //   margin: const EdgeInsets.all(10.0),
-            //                     //   imageUrl: articles[index].imageUrl,
-            //                     // ),
-            //                     Container(
-            //                       margin: const EdgeInsets.all(10.0),
-            //                       child: ClipRRect(
-            //                         borderRadius: BorderRadius.circular(5.0),
-            //                         child: CachedNetworkImage(
-            //                           imageUrl: articles[index].imageUrl,
-            //                           cacheKey: articles[index].imageUrl,
-            //                           height: 80,
-            //                           width: 80,
-            //                           fit: BoxFit.cover,
-            //                           placeholder: (context, url) => Image.asset(
-            //                             'assets/images/placeholder.png',
-            //                           ),
-            //                           errorWidget: (context, url, error) =>
-            //                               const Icon(Icons.error_rounded),
-            //                         ),
-            //                       ),
-            //                     ),
-            //                     Expanded(
-            //                       child: Column(
-            //                         mainAxisAlignment: MainAxisAlignment.center,
-            //                         crossAxisAlignment: CrossAxisAlignment.start,
-            //                         children: [
-            //                           Text(
-            //                             articles[index].title,
-            //                             maxLines: 2,
-            //                             overflow: TextOverflow.clip,
-            //                             style: Theme.of(context)
-            //                                 .textTheme
-            //                                 .bodyLarge!
-            //                                 .copyWith(
-            //                                   fontWeight: FontWeight.bold,
-            //                                 ),
-            //                           ),
-            //                           const SizedBox(height: 10),
-            //                           Row(
-            //                             children: [
-            //                               const Icon(
-            //                                 Icons.schedule,
-            //                                 size: 18,
-            //                                 color: Colors.black54,
-            //                               ),
-            //                               const SizedBox(width: 5),
-            //                               Text(
-            //                                 '${DateTime.now().difference(articles[index].createdAt).inHours} hours ago',
-            //                                 style: const TextStyle(
-            //                                   fontSize: 12,
-            //                                   color: Colors.black54,
-            //                                 ),
-            //                               ),
-            //                               const SizedBox(width: 20),
-            //                               const Icon(
-            //                                 Icons.visibility,
-            //                                 size: 18,
-            //                                 color: Colors.black54,
-            //                               ),
-            //                               const SizedBox(width: 5),
-            //                             ],
-            //                           ),
-            //                         ],
-            //                       ),
-            //                     ),
-            //                   ],
-            //                 ),
-            //               );
-            //             },
-            //           ),
-            //         ),
-            //       )
-            //       .toList(),
-            // ),
-
-            )
+            ))
       ],
     );
   }

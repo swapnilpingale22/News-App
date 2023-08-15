@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_news_app/screens/web_view_screen.dart';
 import 'package:flutter_news_app/widgets/custom_tag.dart';
 import 'package:url_launcher/url_launcher.dart';
-import '../models/article_model.dart';
+import 'package:flutter_news_app/models/newscatcher_model.dart';
 
 class ArticleScreen extends StatefulWidget {
   const ArticleScreen({super.key});
@@ -23,8 +23,8 @@ class _ArticleScreenState extends State<ArticleScreen> {
           fit: BoxFit.cover,
           alignment: Alignment.topCenter,
           image: CachedNetworkImageProvider(
-            article.imageUrl,
-            cacheKey: article.imageUrl,
+            article.media.toString(),
+            cacheKey: article.media,
             errorListener: () => Image.asset(
               'assets/images/placeholder.png',
             ),
@@ -92,7 +92,7 @@ class _NewsBodyState extends State<_NewsBody> {
                 width: 10,
               ),
               Text(
-                widget.article.author,
+                widget.article.author.toString(),
                 style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                       color: Colors.white,
                     ),
@@ -112,7 +112,7 @@ class _NewsBodyState extends State<_NewsBody> {
                   ),
                   const SizedBox(width: 5),
                   Text(
-                      '${DateTime.now().difference(widget.article.createdAt).inHours} h',
+                      '${DateTime.now().difference(widget.article.publishedDate as DateTime).inHours} h',
                       style: Theme.of(context).textTheme.bodyMedium!),
                 ],
               ),
@@ -142,9 +142,9 @@ class _NewsBodyState extends State<_NewsBody> {
           // ),
           const SizedBox(height: 20),
           Text(
-            widget.article.body != "--"
-                ? '${widget.article.body.substring(0, widget.article.body.length - 15)}...'
-                : widget.article.body,
+            widget.article.summary != "--"
+                ? '${widget.article.summary.toString().substring(0, widget.article.summary.toString().length - 15)}...'
+                : widget.article.summary.toString(),
             style: Theme.of(context).textTheme.bodyLarge!.copyWith(height: 1.5),
           ),
           Row(
@@ -153,7 +153,7 @@ class _NewsBodyState extends State<_NewsBody> {
                 onPressed: () {
                   setState(() {
                     launchUrl(
-                      Uri.parse(widget.article.url),
+                      Uri.parse(widget.article.link.toString()),
                       mode: LaunchMode.inAppWebView,
                     );
                   });
@@ -180,7 +180,7 @@ class _NewsBodyState extends State<_NewsBody> {
                     context,
                     MaterialPageRoute(
                       builder: (context) => WebViewScreen(
-                        url: widget.article.imageUrl,
+                        url: widget.article.media.toString(),
                       ),
                     ),
                   );
@@ -191,8 +191,8 @@ class _NewsBodyState extends State<_NewsBody> {
                     borderRadius: BorderRadius.circular(10),
                     child: CachedNetworkImage(
                       width: MediaQuery.of(context).size.width * 0.42,
-                      imageUrl: widget.article.imageUrl,
-                      cacheKey: widget.article.imageUrl,
+                      imageUrl: widget.article.media.toString(),
+                      cacheKey: widget.article.media.toString(),
                       fit: BoxFit.cover,
                       placeholder: (context, url) => Image.asset(
                         'assets/images/placeholder.png',
@@ -235,7 +235,7 @@ class _NewsHeadlineState extends State<_NewsHeadline> {
           ),
           const SizedBox(height: 10),
           Text(
-            widget.article.title,
+            widget.article.title.toString(),
             style: Theme.of(context).textTheme.headlineSmall!.copyWith(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
@@ -243,7 +243,7 @@ class _NewsHeadlineState extends State<_NewsHeadline> {
                 ),
           ),
           Text(
-            widget.article.subtitle,
+            widget.article.excerpt.toString(),
             style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                   color: Colors.white,
                 ),
